@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Happy Birthday Fireworks</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: black;
+      font-family: sans-serif;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .title {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      gap: 15px;
+      opacity: 1;
+      z-index: 1;
+    }
+
+    .letter {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(200px) scale(0);
+      background: linear-gradient(
+        115deg,
+        #fffbe6 0%,
+        #ffe066 10%,
+        #ffd700 22%,
+        #fffbe6 30%,
+        #b8860b 45%,
+        #ffd700 60%,
+        #fffbe6 70%,
+        #b8860b 85%,
+        #fffbe6 100%
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow:
+        0 1px 0 #fffbe6,
+        2px 4px 12px #333,
+        0 0 20px #ffd700,
+        0 0 2px #fffbe6;
+      font-family: "Arial Black", sans-serif;
+      font-size: 100px;
+      font-weight: bold;
+      animation: flyIn 1.8s forwards, metallic-shine 2.5s linear infinite;
+    }
+
+    @keyframes metallic-shine {
+      0% { background-position: -200px 0; }
+      50% { background-position: 200px 0; }
+      100% { background-position: -200px 0; }
+    }
+
+    @keyframes flyIn {
+      0% { opacity: 0; transform: translateY(200px) scale(0); }
+      70% { opacity: 1; transform: translateY(-30px) scale(1.2); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    #celebrate-btn {
+      position: absolute;
+      top: 70%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px 40px;
+      font-size: 28px;
+      font-weight: bold;
+      background: linear-gradient(45deg, #ffd700, #ffa500, #ff4500);
+      border: none;
+      border-radius: 15px;
+      color: #fff;
+      cursor: pointer;
+      opacity: 0;
+      box-shadow: 0 0 20px #fff, 0 0 30px #ff0, 0 0 40px #ffa500;
+      text-shadow: 0 0 5px #fff;
+      transition: all 0.8s ease;
+      z-index: 1;
+    }
+
+    #celebrate-btn.show {
+      opacity: 1;
+    }
+
+    #back-btn {
+      position: absolute;
+      top: 10%;
+      left: 5%;
+      transform: translate(-50%, -50%);
+      padding: 10px 18px;
+      font-size: 18px;
+      font-weight: bold;
+      background: linear-gradient(45deg, #444, #888);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      opacity: 0;
+      box-shadow: 0 0 8px #fff, 0 0 10px #888;
+      text-shadow: 0 0 2px #fff;
+      transition: all 0.8s ease;
+      z-index: 2;
+    }
+
+    #back-btn.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <div class="title" id="title"></div>
+  <button id="back-btn">&#8592; Back</button>
+
+  <script>
+    const titleText = "HBD SAMRITHA!";
+    const titleContainer = document.getElementById("title");
+    const backBtn = document.getElementById("back-btn");
+
+    // Add letters with delay
+    [...titleText].forEach((char, i) => {
+      const span = document.createElement("span");
+      span.classList.add("letter");
+      span.style.animationDelay = `${i * 0.25}s`;
+      span.innerText = char;
+      titleContainer.appendChild(span);
+    });
+
+    // Fireworks canvas
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let particles = [];
+
+    function random(min, max) { return Math.random() * (max - min) + min; }
+
+    class Particle {
+      constructor(x, y, color, speed, radius) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.radius = radius;
+        this.speed = speed;
+        this.angle = random(0, Math.PI * 2);
+        this.friction = 0.95;
+        this.gravity = 0.08;
+        this.alpha = 1;
+        this.decay = random(0.01, 0.03);
+      }
+
+      update() {
+        this.speed *= this.friction;
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed + this.gravity;
+        this.alpha -= this.decay;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function createFirework(x, y) {
+      const colors = ["#ff0", "#f0f", "#0ff", "#ff4500", "#00ff00", "#1e90ff", "#ff1493", "#ffa500"];
+      let count = 150;
+      for (let i = 0; i < count; i++) {
+        particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)], random(4, 15), random(2, 4)));
+      }
+    }
+
+    function animate() {
+      ctx.fillStyle = "rgba(0,0,0,0.2)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach((p, i) => {
+        p.update();
+        p.draw();
+        if (p.alpha <= 0) particles.splice(i, 1);
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    function startFireworks() {
+      animate();
+      setInterval(() => {
+        for (let i = 0; i < 6; i++) {
+          const x = random(100, canvas.width - 100);
+          const y = random(50, canvas.height / 2);
+          createFirework(x, y);
+        }
+      }, 800);
+    }
+
+    // Show back button & start fireworks after letters animation
+    setTimeout(() => {
+      backBtn.classList.add("show");
+      startFireworks();
+      for (let i = 0; i < 8; i++) {
+        const x = random(100, canvas.width - 100);
+        const y = random(50, canvas.height / 2);
+        createFirework(x, y);
+      }
+    }, titleText.length * 250 + 1800);
+
+    // Back button click
+    backBtn.addEventListener("click", () => {
+      window.history.back();
+    });
+  </script>
+</body>
+</html>

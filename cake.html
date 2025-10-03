@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>R4X Bot 3D Gifts</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    #canvas3d {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+      background: linear-gradient(135deg, #f5f6fa, #d1c4e9);
+    }
+
+    /* Hide Spline watermark */
+    .spline-watermark,
+    [class*="watermark"],
+    [aria-label="Built with Spline"] {
+      display: none !important;
+    }
+
+    #notice-board {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      background: #fffbe6;
+      color: #222;
+      border: 1px solid #ffd700;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 0.75em;
+      font-family: sans-serif;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      z-index: 1000;
+      max-width: 180px;
+      text-align: left;
+      opacity: 0.95;
+    }
+
+    .gift-btn {
+      position: fixed;
+      display: none;
+      z-index: 1001;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 64px;
+      height: 64px;
+      padding: 0;
+      font-size: 2em;
+      transition: transform 0.2s;
+    }
+    .gift-btn:hover { transform: scale(1.1); }
+
+    #gift-btn-2 {
+      background: #fff0f6;
+      color: #e75480;
+      border: 2px solid #e75480;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas3d"></canvas>
+
+  <div id="notice-board">
+    Small presents for you. Click the gifts to see them! 😊
+  </div>
+
+  <!-- Gift buttons -->
+  <button id="gift-btn-1" class="gift-btn">🎁</button>
+  <button id="gift-btn-2" class="gift-btn">🌸</button>
+
+  <script type="module">
+    import { Application } from 'https://unpkg.com/@splinetool/runtime';
+
+    const canvas = document.getElementById('canvas3d');
+    const app = new Application(canvas);
+    app.load('https://prod.spline.design/5DPXqieb0w20aMc3/scene.splinecode');
+
+    const giftBtn1 = document.getElementById('gift-btn-1');
+    const giftBtn2 = document.getElementById('gift-btn-2');
+
+    // Helper: random position for gifts
+    function getRandomPosition() {
+      const margin = 80;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const x = Math.floor(Math.random() * (vw - margin));
+      const y = Math.floor(Math.random() * (vh - margin));
+      return { left: x, top: y };
+    }
+
+    function showGiftButton(btn) {
+      const pos = getRandomPosition();
+      btn.style.left = pos.left + 'px';
+      btn.style.top = pos.top + 'px';
+      btn.style.display = 'block';
+    }
+
+    // Initially hide buttons
+    giftBtn1.style.display = 'none';
+    giftBtn2.style.display = 'none';
+
+    // Show first gift after 4 seconds
+    window.addEventListener('load', () => {
+      setTimeout(() => showGiftButton(giftBtn1), 4000);
+    });
+
+    // First gift click -> open first.html
+    giftBtn1.addEventListener('click', () => {
+      localStorage.setItem('giftClicked', 'true'); // store click
+      window.location.href = 'first.html';
+    });
+
+    // Check if user returned from first.html to show flower button
+    window.addEventListener('load', () => {
+      if (localStorage.getItem('giftClicked')) {
+        setTimeout(() => showGiftButton(giftBtn2), 1000);
+      }
+    });
+
+    // Flower click -> navigate to second.html
+    giftBtn2.addEventListener('click', () => {
+      giftBtn2.style.display = 'none';
+      localStorage.removeItem('giftClicked'); // reset
+      window.location.href = 'second.html';
+    });
+  </script>
+</body>
+</html>
