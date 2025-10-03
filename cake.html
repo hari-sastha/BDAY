@@ -78,61 +78,61 @@
   <button id="gift-btn-1" class="gift-btn">🎁</button>
   <button id="gift-btn-2" class="gift-btn">🌸</button>
 
-  <script type="module">
-    import { Application } from 'https://unpkg.com/@splinetool/runtime';
+ <script type="module">
+  import { Application } from 'https://unpkg.com/@splinetool/runtime';
 
-    const canvas = document.getElementById('canvas3d');
-    const app = new Application(canvas);
-    app.load('https://prod.spline.design/5DPXqieb0w20aMc3/scene.splinecode');
+  const canvas = document.getElementById('canvas3d');
+  const app = new Application(canvas);
+  app.load('https://prod.spline.design/5DPXqieb0w20aMc3/scene.splinecode');
 
-    const giftBtn1 = document.getElementById('gift-btn-1');
-    const giftBtn2 = document.getElementById('gift-btn-2');
+  const giftBtn1 = document.getElementById('gift-btn-1');
+  const giftBtn2 = document.getElementById('gift-btn-2');
 
-    // Helper: random position for gifts
-    function getRandomPosition() {
-      const margin = 80;
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const x = Math.floor(Math.random() * (vw - margin));
-      const y = Math.floor(Math.random() * (vh - margin));
-      return { left: x, top: y };
-    }
+  // Helper: random position for gifts
+  function getRandomPosition() {
+    const margin = 80;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const x = Math.floor(Math.random() * (vw - margin));
+    const y = Math.floor(Math.random() * (vh - margin));
+    return { left: x, top: y };
+  }
 
-    function showGiftButton(btn) {
-      const pos = getRandomPosition();
-      btn.style.left = pos.left + 'px';
-      btn.style.top = pos.top + 'px';
-      btn.style.display = 'block';
-    }
+  function showGiftButton(btn) {
+    const pos = getRandomPosition();
+    btn.style.left = pos.left + 'px';
+    btn.style.top = pos.top + 'px';
+    btn.style.display = 'block';
+  }
 
-    // Initially hide buttons
-    giftBtn1.style.display = 'none';
+  // Initially hide buttons
+  giftBtn1.style.display = 'none';
+  giftBtn2.style.display = 'none';
+
+  // Show first gift after 4 seconds, then second gift 2 seconds later
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      showGiftButton(giftBtn1);
+
+      // Show the second gift 2 seconds after first
+      setTimeout(() => {
+        showGiftButton(giftBtn2);
+      }, 2000);
+    }, 4000);
+  });
+
+  // First gift click -> open first.html
+  giftBtn1.addEventListener('click', () => {
+    localStorage.setItem('giftClicked', 'true'); // store click
+    window.location.href = 'first.html';
+  });
+
+  // Flower click -> navigate to second.html
+  giftBtn2.addEventListener('click', () => {
     giftBtn2.style.display = 'none';
-
-    // Show first gift after 4 seconds
-    window.addEventListener('load', () => {
-      setTimeout(() => showGiftButton(giftBtn1), 4000);
-    });
-
-    // First gift click -> open first.html
-    giftBtn1.addEventListener('click', () => {
-      localStorage.setItem('giftClicked', 'true'); // store click
-      window.location.href = 'first.html';
-    });
-
-    // Check if user returned from first.html to show flower button
-    window.addEventListener('load', () => {
-      if (localStorage.getItem('giftClicked')) {
-        setTimeout(() => showGiftButton(giftBtn2), 1000);
-      }
-    });
-
-    // Flower click -> navigate to second.html
-    giftBtn2.addEventListener('click', () => {
-      giftBtn2.style.display = 'none';
-      localStorage.removeItem('giftClicked'); // reset
-      window.location.href = 'second.html';
-    });
-  </script>
+    localStorage.removeItem('giftClicked'); // reset
+    window.location.href = 'second.html';
+  });
+</script>
 </body>
 </html>
